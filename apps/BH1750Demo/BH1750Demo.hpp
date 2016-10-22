@@ -31,12 +31,14 @@ struct Main {
     //auto_field(readResult, deadline(rt, 240_ms));
     TWI<> twi = {};
     auto_field(bh, bh1750(twi, rt));
+    auto_field(pin, JeeNodePort1D());
 
     typedef Delegate<This, decltype(pinTX), &This::pinTX,
             Delegate<This, decltype(rt), &This::rt,
             Delegate<This, decltype(twi), &This::twi>>> Handlers;
 
     void main() {
+        pin.configureAsOutputHigh();
     	log::debug(F("BH1750Demo"));
         pinTX.flush();
 /*

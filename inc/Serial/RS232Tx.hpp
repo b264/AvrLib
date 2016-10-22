@@ -1,6 +1,5 @@
 #pragma once
 
-#include "avr/common.h"
 #include "HAL/Atmel/Timer.hpp"
 #include "Fifo.hpp"
 #include "AtomicScope.hpp"

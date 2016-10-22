@@ -8,12 +8,16 @@
 #ifndef ADC_HPP_
 #define ADC_HPP_
 
-#include <avr/io.h>
+#include <HAL/Atmel/Registers.hpp>
+#include <HAL/Atmel/InterruptHandlers.hpp>
 #include "AtomicScope.hpp"
-#include "HAL/Atmel/InterruptHandlers.hpp"
+#include <stdint.h>
 
 namespace HAL {
 namespace Atmel {
+
+using namespace InterruptHandlers;
+using namespace Registers;
 
 enum class ADReference: uint8_t {
     /** AREF, Internal V ref turned off */
@@ -91,12 +95,16 @@ public:
 
     ADConverter() {
 #if (F_CPU == 16000000)
-        ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Set ADC prescaler to 128 - 125KHz ADC rate -> 10kHz sampling rate
+    	// Set ADC prescaler to 128: 125KHz sample rate @ 16MHz
+    	ADPS2.set();
+    	ADPS1.set();
+    	ADPS0.set();
+        //ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 #endif
     }
 
     uint16_t awaitValue(){
-        while (ADCSRA & (1 << ADSC)) ;
+        while (ADSC.isSet()) ;
         return getValue();
     }
 
@@ -113,13 +121,18 @@ public:
 
     ADConverter() {
 #if (F_CPU == 16000000)
-        ADCSRA |= (1 << ADPS2) | (1 << ADPS0);// Set ADC prescaler to 32 - 500KHz ADC rate -> 40kHz sampling rate
+    	// Set ADC prescaler to 32: 500KHz ADC rate -> 40kHz sampling rate
+    	ADPS2.set();
+    	ADPS1.clear();
+    	ADPS0.set();
+        //ADCSRA |= (1 << ADPS2) | (1 << ADPS0);
 #endif
-        ADMUX |= (1 << ADLAR); // Using only 8 bits in ADCH register
+    	ADLAR.set();    // Using only 8 bits in ADCH register
+        //ADMUX |= (1 << ADLAR);
     }
 
     uint8_t awaitValue() {
-        while (ADCSRA & (1 << ADSC)) ;
+        while (ADSC.isSet()) ;
         return getValue();
     }
 

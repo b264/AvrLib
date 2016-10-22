@@ -14,8 +14,6 @@
 #include "AtomicScope.hpp"
 #include <gcc_limits.h>
 #include <gcc_type_traits.h>
-#include <util/atomic.h>
-#include <avr/sleep.h>
 
 namespace HAL { namespace Atmel { namespace Impl { template <typename> class Power; }}}
 

@@ -6,8 +6,7 @@
 #include "Fifo.hpp"
 #include "Streams/Format.hpp"
 #include "AtomicScope.hpp"
-
-#include <avr/io.h>
+#include <HAL/Atmel/Registers.hpp>
 
 #ifndef AVR
 #include <stdarg.h>
@@ -23,6 +22,8 @@ extern volatile uint8_t debugTimingsCount;
 static uint16_t debugStartTime;
 
 namespace Logging {
+
+using namespace HAL::Atmel::Registers;
 
 #ifndef AVR
 namespace Impl {

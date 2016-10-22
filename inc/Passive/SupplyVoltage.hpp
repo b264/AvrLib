@@ -4,8 +4,6 @@
 #include "EEPROM.hpp"
 #include "HAL/Atmel/ADConverter.hpp"
 #include "Logging.hpp"
-#include <avr/sleep.h>
-#include <util/atomic.h>
 
 namespace Passive {
 
@@ -14,6 +12,7 @@ using namespace HAL::Atmel;
 namespace Impl {
 
 using namespace Streams;
+using namespace HAL::Atmel::Impl;
 
 /**
  * Calculates the supply / battery voltage, assuming it's connected to one of the analog
@@ -80,16 +79,14 @@ public:
 
             onShutdown();
 
-            ADCSRA &= ~ _BV(ADEN); // disable the ADC
-            PCICR &= ~(_BV(PCIE0) | _BV(PCIE1) | _BV(PCIE2)); // disable pin-change interrupts
-            EIMSK &= ~(_BV(INT0) | _BV(INT1)); // disable hardware interrupts
+            ADEN.clear(); // disable the ADC
+            PCIE0.clear(); // disable pin-change interrupts
+            PCIE1.clear();
+            PCIE2.clear();
+            INT0.clear(); // disable hardware interrupts
+            INT1.clear();
 
-            set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-            ATOMIC_BLOCK(ATOMIC_FORCEON) {
-                sleep_enable();
-                sleep_bod_disable();
-            }
-            sleep_cpu();
+            sleep(SleepMode::POWER_DOWN);
 
             // If by some magic, we manage to wake up, restore and re-measure
             lowReadingsUntilStop = lowReadingsNeeded;
